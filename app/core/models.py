@@ -1,6 +1,8 @@
 from django.db import models
+from django.db.models.signals import pre_save, post_save
 
 from core.utils.constants import Constants
+from core.utils.data_convertion import DataConversion
 
 
 class ExcelFile(models.Model):
@@ -22,22 +24,23 @@ class CsvFile(models.Model):
 
 
 class ViralLoad(models.Model):
-    laboratory_id = models.IntegerField(null=True, blank=True)
+    laboratory_id = models.CharField(max_length=100, null=True, blank=True)
     sector = models.CharField(max_length=30, blank=True, null=True)
     number_orig_lab = models.CharField(max_length=100, blank=True, null=True)
     province = models.CharField(max_length=100, blank=True, null=True)
-    distrit = models.CharField(max_length=100, blank=True, null=True)
+    district = models.CharField(max_length=100, blank=True, null=True)
     health_facility = models.CharField(max_length=100, blank=True, null=True)
     patient_name = models.CharField(max_length=100, blank=True, null=True)
-    gender = models.CharField(max_length=100, blank=True)
+    gender = models.CharField(max_length=100, blank=True, null=True)
     reference = models.CharField(max_length=100, blank=True, null=True)
     capture_date = models.DateField(null=True, blank=True)
     access_date = models.DateField(null=True, blank=True)
     nid = models.CharField(max_length=100, blank=True, null=True)
-    viral_load = models.PositiveIntegerField(null=True, blank=True)
+    viral_load = models.CharField(max_length=100, null=True, blank=True)
     viral_load_qualitative = models.CharField(
         max_length=100, blank=True, null=True)
     synced = models.BooleanField(default=False)
+    formatted_nid = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Viral Load'
@@ -45,6 +48,27 @@ class ViralLoad(models.Model):
 
     def __str__(self):
         return self.patient_name
+
+
+class ExcelImport(models.Model):
+    laboratory_id = models.CharField(max_length=100, null=True, blank=True)
+    sector = models.CharField(max_length=30, blank=True, null=True)
+    number_orig_lab = models.CharField(max_length=100, blank=True, null=True)
+    province = models.CharField(max_length=100, blank=True, null=True)
+    district = models.CharField(max_length=100, blank=True, null=True)
+    health_facility = models.CharField(max_length=100, blank=True, null=True)
+    patient_name = models.CharField(max_length=100, blank=True, null=True)
+    gender = models.CharField(max_length=100, blank=True, null=True)
+    reference = models.CharField(max_length=100, blank=True, null=True)
+    capture_date = models.DateField(null=True, blank=True)
+    access_date = models.DateField(null=True, blank=True)
+    nid = models.CharField(max_length=100, blank=True, null=True)
+    viral_load = models.CharField(max_length=100, null=True, blank=True)
+    viral_load_qualitative = models.CharField(
+        max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.laboratory_id
 
 
 class Patient(models.Model):
@@ -66,6 +90,7 @@ class Encounter(models.Model):
         max_length=255, default=Constants().get_uuids().get('hpt'))
     form_uuid = models.CharField(
         max_length=255, default=Constants().get_uuids().get('form'))
+    synced = models.BooleanField(default=False)
 
     def __str__(self):
         return self.patient.name
@@ -84,6 +109,16 @@ class Observation(models.Model):
         max_length=255, default=Constants().get_uuids().get('hpt'))
     value = models.CharField(max_length=255)
     voided = models.BooleanField(default=False)
+    synced = models.BooleanField(default=False)
 
     def __str__(self):
         return self.id
+
+
+# def insert_formatted_nid(sender, instance, created, *args, **kwargs):
+#     if created:
+#         instance.formatted_nid = DataConversion.format_nid(instance.nid)
+#         print(instance.formatted_nid)
+
+
+# post_save.connect(insert_formatted_nid, sender=ViralLoad)
