@@ -50,30 +50,9 @@ class ViralLoad(models.Model):
         return self.patient_name
 
 
-class ExcelImport(models.Model):
-    laboratory_id = models.CharField(max_length=100, null=True, blank=True)
-    sector = models.CharField(max_length=30, blank=True, null=True)
-    number_orig_lab = models.CharField(max_length=100, blank=True, null=True)
-    province = models.CharField(max_length=100, blank=True, null=True)
-    district = models.CharField(max_length=100, blank=True, null=True)
-    health_facility = models.CharField(max_length=100, blank=True, null=True)
-    patient_name = models.CharField(max_length=100, blank=True, null=True)
-    gender = models.CharField(max_length=100, blank=True, null=True)
-    reference = models.CharField(max_length=100, blank=True, null=True)
-    capture_date = models.DateField(null=True, blank=True)
-    access_date = models.DateField(null=True, blank=True)
-    nid = models.CharField(max_length=100, blank=True, null=True)
-    viral_load = models.CharField(max_length=100, null=True, blank=True)
-    viral_load_qualitative = models.CharField(
-        max_length=100, blank=True, null=True)
-
-    def __str__(self):
-        return self.laboratory_id
-
-
 class Patient(models.Model):
-    patient_uuid = models.CharField(max_length=500, primary_key=True)
-    patient_id = models.IntegerField()
+    patient_uuid = models.CharField(max_length=500)
+    #person_id = models.IntegerField()
     nid = models.CharField(max_length=100, blank=True, null=True)
     patient_name = models.CharField(max_length=100, blank=True, null=True)
 
@@ -97,8 +76,8 @@ class Encounter(models.Model):
 
 
 class Observation(models.Model):
-    person = models.ForeignKey(
-        Patient, related_name='patient', on_delete=models.CASCADE)
+    patient = models.ForeignKey(
+        Patient, on_delete=models.CASCADE)
     obsDateTime = models.DateTimeField(auto_now_add=True)
     concept = models.CharField(max_length=255)
     value_numeric = models.PositiveIntegerField(null=True, blank=True)

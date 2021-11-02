@@ -1,6 +1,11 @@
 class Constants:
+
+    BASE_URL = 'http://192.168.182.132:8080/openmrs/'
+
     UUIDS = {
         'encounter_type': 'e2790f68-1d5f-11e0-b929-000c29ad1d07',
+        'encounter_role': 'a0b03050-c99b-11e0-9572-0800200c9a66',
+        'provider': '7013d271-1bc2-4a50-bed6-8932044bc18f',
         'data_colheita_obs': 'f85e3f84-a255-412a-aa43-40174f69c305',
         'data_pedido_obs': '892a98b2-9c98-4813-b4e5-0b434d14404d',
         'valor_carga_concept': 'e1d6247e-1d5f-11e0-b929-000c29ad1d07',
@@ -66,6 +71,10 @@ class Constants:
     }
 
     SLASH = '/'
+
+    AUTH = (
+        'admin', 'eSaude123'
+    )
 
     def get_uuids(self):
         return self.UUIDS

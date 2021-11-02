@@ -23,9 +23,13 @@ class DataConversion:
     @staticmethod
     def convert_to_datetime(str_date):
         if str_date == '':
-            date_str_format = '1900-01-01'
+            date_str_format = '1900-01-01 00:00:00'
         else:
             date_str_format = str_date[5:] + '-' + \
                 Constants().get_months().get(
-                    str_date[2:5]) + '-' + str_date[0:2]
-        return datetime.strptime(date_str_format, '%Y-%m-%d')
+                    str_date[2:5]) + '-' + str_date[0:2] + ' 00:00:00'
+        return datetime.strptime(date_str_format, '%Y-%m-%d %H:%M:%S')
+
+    @staticmethod
+    def format_datetime(date):
+        return date.strftime('%Y-%m-%d %H:%M:%S')

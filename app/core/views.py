@@ -1,28 +1,14 @@
 from django.shortcuts import render
 from core.forms import ExcelForm
-from core.models import CsvFile, ExcelFile, ViralLoad, ExcelImport
+from core.models import CsvFile, ExcelFile, ViralLoad
 from core.utils.data_convertion import DataConversion
+from core.service.data_from_openmrs import OpenMRSData
+from core.service.post_labdata import LabData
 
 
 import csv
 import pandas as pd
 
-
-#  0 laboratory_id = models.IntegerField(null=True, blank=True)
-#  5   sector = models.CharField(max_length=30, blank=True, null=True)
-#  7  number_orig_lab = models.CharField(max_length=100, blank=True, null=True)
-#  9   province = models.CharField(max_length=100, blank=True, null=True)
-#  11   district = models.CharField(max_length=100, blank=True, null=True)
-#  12  health_facility = models.CharField(max_length=100, blank=True, null=True)
-#  14   patient_name = models.CharField(max_length=100, blank=True, null=True)
-#  22   gender = models.CharField(max_length=100, blank=True, null=True)
-#  23   reference = models.CharField(max_length=100, blank=True, null=True)
-#  32   capture_date = models.DateField(null=True, blank=True)
-#  34   access_date = models.DateField(null=True, blank=True)
-#  41   nid = models.CharField(max_length=100, blank=True, null=True)
-#  56   viral_load = models.PositiveIntegerField(null=True, blank=True)
-#  58   viral_load_qualitative = models.CharField(
-#         max_length=100, blank=True, null=True)
 
 def upload_excel_file(request):
     form = ExcelForm(request.POST or None, request.FILES or None)
@@ -71,25 +57,10 @@ def upload_excel_file(request):
                 viralLoad.save()
                 ViralLoad.objects.filter(nid="").delete()
                 ViralLoad.objects.filter(viral_load__contains="NAME").delete()
-                # qs = ExcelImport.objects.all()
-                # for q in qs:
-                #     viral_load = ViralLoad.objects.create(
-                #         laboratory_id=q.laboratory_id,
-                #         sector=q.sector,
-                #         number_orig_lab=q.laboratory_id,
-                #         province=q.province,
-                #         district=q.district,
-                #         health_facility=q.health_facility,
-                #         patient_name=q.patient_name,
-                #         gender=q.gender,
-                #         reference=q.reference,
-                #         capture_date=q.capture_date,
-                #         access_date=q.access_date,
-                #         nid=DataConversion.format_nid(q.nid),
-                #         viral_load=q.viral_load,
-                #         viral_load_qualitative=q.viral_load_qualitative
-                #     )
-                #     viral_load.save()
-   # ExcelImport.objects.all().delete()
+
+            patients = OpenMRSData()
+            patients.fetch_patient_data(
+                'ws/rest/v1/reportingrest/dataSet/88e8572c-fdd4-4e78-b5c4-34c376453d27')
+            LabData().post_data('http://192.168.182.132:8080/openmrs/ws/rest/v1/encounter')
 
     return render(request, 'app/upload.html', {'form': form})
